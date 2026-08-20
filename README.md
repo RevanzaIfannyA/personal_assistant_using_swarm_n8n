@@ -121,14 +121,14 @@ One of the project's strongest architectural decisions is its **model-agnostic d
 
 The n8n agent nodes are designed with interchangeable language model components:
 
-| LLM Provider | Integration Method | Use Case |
-|--------------|-------------------|----------|
-| **Google Gemini** | n8n native node | Current production model (Flash Lite) |
-| **OpenAI** | n8n native node | GPT-4, GPT-3.5 Turbo for higher reasoning |
-| **Ollama** | HTTP Request node | Local, private, cost-effective inference |
-| **Anthropic Claude** | n8n native node | Complex reasoning and analysis |
-| **Mistral AI** | n8n native node | European hosting, competitive pricing |
-| **Groq** | n8n native node | Ultra-fast inference for real-time responses |
+| LLM Provider | Use Case |
+|--------------|----------|
+| **Google Gemini** | Current production model (Flash Lite) |
+| **OpenAI** | GPT-4, GPT-3.5 Turbo for higher reasoning |
+| **Ollama** | Local, private, cost-effective inference |
+| **Anthropic Claude** | Complex reasoning and analysis |
+| **Mistral AI** | European hosting, competitive pricing |
+| **Groq** | Ultra-fast inference for real-time responses |
 
 ### Why This Matters
 
@@ -143,7 +143,7 @@ The n8n agent nodes are designed with interchangeable language model components:
 The system can intelligently route different tasks to different models:
 
 ```
-Simple Task (e.g., "Schedule meeting") → Ollama (local, fast, free)
+Simple Task (e.g., "Schedule meeting") → Ollama (local, free)
 Complex Reasoning (e.g., "Analyze email sentiment") → GPT-4 (high accuracy)
 Voice Transcription → Gemini (built-in multimodal)
 Research → Claude (large context window)
