@@ -4,6 +4,7 @@
 - [Business Problem](#business-problem)
 - [Solution Overview](#solution-overview)
 - [Technical Architecture](#technical-architecture)
+- [LLM Flexibility & Model Agnostic Design](#llm-flexibility--model-agnostic-design)
 - [Key Features](#key-features)
 - [Skills Demonstrated](#skills-demonstrated)
 - [Impact & Business Value](#impact--business-value)
@@ -110,6 +111,55 @@ Consolidated Output → User
 
 ---
 
+## LLM Flexibility & Model Agnostic Design
+
+### Plug-and-Play LLM Architecture
+
+One of the project's strongest architectural decisions is its **model-agnostic design**. While the current implementation uses Google Gemini 3.5 Flash Lite, the system is built to support multiple LLM providers without workflow modifications.
+
+### Supported LLM Providers
+
+The n8n agent nodes are designed with interchangeable language model components:
+
+| LLM Provider | Integration Method | Use Case |
+|--------------|-------------------|----------|
+| **Google Gemini** | n8n native node | Current production model (Flash Lite) |
+| **OpenAI** | n8n native node | GPT-4, GPT-3.5 Turbo for higher reasoning |
+| **Ollama** | HTTP Request node | Local, private, cost-effective inference |
+| **Anthropic Claude** | n8n native node | Complex reasoning and analysis |
+| **Mistral AI** | n8n native node | European hosting, competitive pricing |
+| **Groq** | n8n native node | Ultra-fast inference for real-time responses |
+
+### Why This Matters
+
+1. **Vendor Lock-in Prevention**: Not tied to any single AI provider
+2. **Cost Optimization**: Choose cheaper models for simple tasks, premium for complex ones
+3. **Privacy & Compliance**: Deploy local models (Ollama) for sensitive data
+4. **Performance Tuning**: Select models based on speed vs. accuracy tradeoffs
+5. **Future-Proofing**: New models can be integrated without architecture changes
+
+### Real-World Application
+
+The system can intelligently route different tasks to different models:
+
+```
+Simple Task (e.g., "Schedule meeting") → Ollama (local, fast, free)
+Complex Reasoning (e.g., "Analyze email sentiment") → GPT-4 (high accuracy)
+Voice Transcription → Gemini (built-in multimodal)
+Research → Claude (large context window)
+```
+
+### Skills Demonstrated Through LLM Flexibility
+
+- **Model Evaluation**: Understanding tradeoffs between providers
+- **Cost Optimization**: Designing for efficient resource usage
+- **Privacy by Design**: Offering local deployment options
+- **API Abstraction**: Creating a unified interface for different providers
+- **Cloud-Native Architecture**: Mixing cloud and local models
+- **Enterprise Readiness**: Meeting diverse compliance requirements (GDPR, HIPAA)
+
+---
+
 ## Key Features
 
 ### 1. Multi-Modal Input Processing
@@ -170,7 +220,7 @@ Calendar → Email
 ## Skills Demonstrated
 
 ### AI & Machine Learning
-- **LLM Integration**: Implementation with Google Gemini 3.5 Flash Lite models
+- **Multi-Provider LLM Integration**: Experience with Gemini, OpenAI, Ollama, Claude
 - **Prompt Engineering**: System prompts optimized for agent behavior
 - **Tool Calling**: AI model that selects and uses appropriate tools
 - **Multi-Modal Processing**: Voice transcription and image analysis
@@ -285,6 +335,13 @@ Calendar → Email
    - ISO 8601 standardization
    - UTC+7 handling
    - Relative date inference
+
+8. **Vendor-Agnostic Architecture**
+   - Supports Gemini, OpenAI, Ollama, Claude, Mistral, Groq
+   - No workflow changes required to switch providers
+   - Mix-and-match different models for different agents
+   - Local deployment option for privacy-sensitive use cases
+   - Enterprise-ready: not locked into any single AI vendor
 
 ---
 
