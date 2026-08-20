@@ -1,0 +1,331 @@
+{
+  "name": "Email Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}\n\nNow: {{ $now.plus(11, 'hour') }}",
+        "options": {
+          "systemMessage": "You are the Email Agent. Execute Gmail operations using available tools.\nCapabilities:\n\nSend emails (to, subject, body, cc, bcc, attachments)\nRead emails (search, filter by sender/date/subject, get specific email by ID)\nReply to emails (reply/reply-all)\nDelete emails\n\nInstructions:\n\nParse incoming requests for email parameters (recipient, subject, body, filters)\nExecute the appropriate Gmail tool\nReturn results as plain text for Telegram (no Markdown, no HTML, escape special chars)\nFor read operations: summarize relevant emails with sender, subject, snippet, and timestamp in ISO 8601 +05:30\nHandle errors gracefully (invalid email, quota limits, authentication issues)\nKeep output concise and under 4096 characters\n\nOutput Format:\nPlain text summary:\n\nAction completed (sent/read/replied/deleted)\nKey details (recipient, subject, timestamp +05:30)\nSuccess/failure status with error details if applicable\n\nBe precise and return clean Telegram-ready text.\n\n\n\nIn case you neeed to fill date in \"get many messages\" tool, write the values as RFC 3339 / ISO 8601 format:\nYYYY-MM-DDTHH:mm:ssZ"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        400,
+        -160
+      ],
+      "id": "a5debd2c-c01f-433d-ba04-639b3a91a9c1",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.sessionId }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        80,
+        80
+      ],
+      "id": "ddcfb832-32d4-4d34-a968-06d67feb02ea",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Only get all the messages when needed.",
+        "operation": "getAll",
+        "returnAll": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_All', ``, 'boolean') }}",
+        "filters": {
+          "receivedAfter": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Received_After', ``, 'string') }}",
+          "receivedBefore": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Received_Before', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        240,
+        128
+      ],
+      "id": "a83ada7f-cb55-4e72-a23a-77d12d75312c",
+      "name": "Get many messages in Gmail",
+      "webhookId": "aa759e1f-292e-4ded-b8c7-cceb797aebbc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OeuOlQg9q21mgF5Y",
+          "name": "Gmail account prima"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        128
+      ],
+      "id": "1d71cea9-e772-4a96-ae57-4667d5f43e12",
+      "name": "Send a message in Gmail",
+      "webhookId": "f0bb7287-309a-4015-8fce-ed22bd50b977",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OeuOlQg9q21mgF5Y",
+          "name": "Gmail account prima"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_ID', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        592,
+        128
+      ],
+      "id": "ff2b2173-8ac1-47ac-a144-98172a4ffb10",
+      "name": "Delete a message in Gmail",
+      "webhookId": "bdb5f71e-d727-400e-824c-182380622028",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OeuOlQg9q21mgF5Y",
+          "name": "Gmail account prima"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_ID', ``, 'string') }}"
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        752,
+        128
+      ],
+      "id": "424ba0cd-d59a-42ae-8d7e-ca6abcc3ffcb",
+      "name": "Get a message in Gmail",
+      "webhookId": "31d548ab-3459-4765-83f6-caf106df2bec",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OeuOlQg9q21mgF5Y",
+          "name": "Gmail account prima"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message_ID', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        912,
+        128
+      ],
+      "id": "84e05797-12f1-4a19-a814-555af4a62177",
+      "name": "Reply to a message in Gmail",
+      "webhookId": "a244489e-ef0d-4c4d-ad19-cadd098be57d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OeuOlQg9q21mgF5Y",
+          "name": "Gmail account prima"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        1088,
+        128
+      ],
+      "id": "724699ae-37f5-4849-bd69-7656cb33694c",
+      "name": "Send message and wait for response in Gmail",
+      "webhookId": "4b02a454-2da4-4301-92d5-7ff7b13f773c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "OeuOlQg9q21mgF5Y",
+          "name": "Gmail account prima"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\n  \"chatInput\": \"a string\",\n  \"sessionId\": \"string\"\n}"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -208,
+        -160
+      ],
+      "id": "e87b0dfc-914d-429b-b901-ee435676ab75",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -64,
+        32
+      ],
+      "id": "4234ee61-ba5c-4817-ac57-8566c5c5fadb",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "GES2NT7qgfyRlz3W",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many messages in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "Asia/Jakarta",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "8a1519a5-010e-4b9c-a5f5-eba5dcdf81a2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "352de1dfab49e3f2827fed937d4c637b6f42d86627f4f11d2e80d40f6758b2b9"
+  },
+  "nodeGroups": [],
+  "id": "yBD7OV2kDOxLpI0V",
+  "tags": []
+}

@@ -1,0 +1,198 @@
+{
+  "name": "Research Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        304,
+        112
+      ],
+      "id": "ab4996e8-64c9-4261-849d-e365f2813ec1",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolWikipedia",
+      "typeVersion": 1,
+      "position": [
+        432,
+        112
+      ],
+      "id": "1c42b2c2-6447-41fe-8d00-0b82f3955977",
+      "name": "Wikipedia"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=user query:  {{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "You are the **Research Agent** combining Tavily Search and Wikipedia and \"Get information about service\" tool.\n\nUse \"get information about service\" HTTP request when asked for my service.\n\n**Tool Logic:**\n- Wikipedia → structured facts, concepts, definitions.  \n- Tavily → live data, trending, new updates.  \n- Combined → when both background + recency are needed (e.g., “latest ChatGPT updates and what ChatGPT is”).\n\n**Rules:**\n1. Use both tools sequentially when context + current info are required.  \n2. Summarize clearly (3–6 lines max).  \n3. No URLs or Markdown.  \n4. Convert mentioned dates to ISO 8601 +05:30.  \n5. Output Telegram-safe plain text ≤4096 chars.\n\n**Examples:**\n- “What is RAG in AI?” → Wikipedia  \n- “Latest AI tools this week.” → Tavily  \n- “Latest ChatGPT updates.” → Tavily + Wikipedia  \nOutput →  \nChatGPT is an AI system by OpenAI.  \nRecent updates (2025-11-07T00:00:00+05:30): memory recall, faster responses, voice mode. "
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        352,
+        -128
+      ],
+      "id": "dceae62c-13d3-4b2f-b9ac-b7826c236a96",
+      "name": "Research Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        128,
+        64
+      ],
+      "id": "e11bf24d-6fdf-4288-93ac-c4653a94cfe5",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "GES2NT7qgfyRlz3W",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "typeVersion": 1,
+      "position": [
+        560,
+        112
+      ],
+      "id": "2fdba3ed-90df-498c-96e0-3ab54ae5fbac",
+      "name": "Search in Tavily",
+      "credentials": {
+        "tavilyApi": {
+          "id": "fRGJ432qbruGhSxy",
+          "name": "Tavily account prima"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get information about the content of the endpoint service",
+        "url": "https://revan-automation-agency.free.beeceptor.com/todos",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.4,
+      "position": [
+        720,
+        64
+      ],
+      "id": "4c0322c1-115d-44df-9762-245797695bd1",
+      "name": "Get information about service"
+    },
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\n  \"chatInput\": \"string\",\n  \"sessionId\": 1234\n}"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -64,
+        -128
+      ],
+      "id": "7c2f1b8e-829f-4512-bb75-81dd1b265402",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wikipedia": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search in Tavily": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get information about service": {
+      "ai_tool": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Research Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "f40c9448-33c2-4ead-8b3f-867f8efc1d03",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "352de1dfab49e3f2827fed937d4c637b6f42d86627f4f11d2e80d40f6758b2b9"
+  },
+  "nodeGroups": [],
+  "id": "BnCvv8jIbmIW9sdK",
+  "tags": []
+}
